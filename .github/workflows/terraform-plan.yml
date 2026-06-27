@@ -39,7 +39,7 @@ jobs:
 
       - name: Terraform Plan -no-color
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color > plan.txt
+        run: terraform plan -no-color -out=tfplan
         working-directory: ./terraform
 
       - name: Upload Terraform Plan
@@ -47,4 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan-${{ github.run_id }}
-          path: ./terraform/plan.txt
+          path: ./terraform/tfplan
+
