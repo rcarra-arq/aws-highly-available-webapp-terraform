@@ -2,24 +2,25 @@ name: Terraform CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
 
 jobs:
   terraform:
     name: Terraform Validate & Plan
     runs-on: ubuntu-latest
-    env:
-       TF_PLUGIN_CACHE_DIR: ${{ runner.temp }}/plugin-cache
 
-steps:
+    env:
+      TF_PLUGIN_CACHE_DIR: ${{ runner.temp }}/plugin-cache
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-        terraform_version: 1.6.0
+          terraform_version: 1.6.0
 
       - name: Terraform Init (clean)
         run: terraform init -upgrade -reconfigure
@@ -33,7 +34,7 @@ steps:
         run: terraform validate
         working-directory: ./terraform
 
-      - name: Terraform Plan -no-color
+      - name: Terraform Plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -out=tfplan
         working-directory: ./terraform
@@ -44,4 +45,3 @@ steps:
         with:
           name: terraform-plan-${{ github.run_id }}
           path: ./terraform/tfplan
-
