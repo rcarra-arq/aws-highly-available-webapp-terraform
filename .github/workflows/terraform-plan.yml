@@ -1,18 +1,14 @@
 name: Terraform CI
-
 on:
   push:
     branches: ["main"]
   pull_request:
-
 jobs:
   terraform:
     name: Terraform Validate & Plan
     runs-on: ubuntu-latest
-
-    env:
-      TF_PLUGIN_CACHE_DIR: /tmp/plugin-cache
-
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
