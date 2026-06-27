@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TF_PLUGIN_CACHE_DIR: ${{ runner.temp }}/plugin-cache
+      TF_PLUGIN_CACHE_DIR: /tmp/plugin-cache
 
     steps:
       - name: Checkout repository
@@ -26,7 +26,7 @@ jobs:
         run: terraform init -upgrade -reconfigure
         working-directory: ./terraform
 
-      - name: Terraform Format
+      - name: Terraform Format Check
         run: terraform fmt -check
         working-directory: ./terraform
 
