@@ -12,21 +12,17 @@ jobs:
     env:
        TF_PLUGIN_CACHE_DIR: ${{ runner.temp }}/plugin-cache
 
-    steps:
+steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
+        terraform_version: 1.6.0
 
       - name: Terraform Init (clean)
-      run: terraform init -upgrade -reconfigure
-      working-directory: ./terraform
-
-      - name: Terraform Init
-        run: terraform init
+        run: terraform init -upgrade -reconfigure
         working-directory: ./terraform
 
       - name: Terraform Format
