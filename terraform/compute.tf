@@ -1,7 +1,19 @@
 # =========================
 # Compute Layer - EC2 Instances
 # =========================
+# =========================
+# AMI (Amazon Linux 2023)
+# =========================
+data "aws_ami" "amazon_linux" {
+  most_recent = true
 
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+
+  owners = ["amazon"]
+}
 
 # =========================
 # IAM Role (for EC2)
@@ -44,7 +56,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 # =========================
 resource "aws_launch_template" "app" {
   name_prefix   = "${var.project_name}-lt-"
-  image_id      = "ami-xxxxxxxxxxxx" # TODO: replace with valid AMI
+  image_id = data.aws_ami.amazon_linux.id
   instance_type = "t2.micro"
 
   iam_instance_profile {
