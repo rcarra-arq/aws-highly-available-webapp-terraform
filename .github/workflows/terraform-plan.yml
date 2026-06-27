@@ -9,6 +9,8 @@ jobs:
   terraform:
     name: Terraform Validate & Plan
     runs-on: ubuntu-latest
+    env:
+       TF_PLUGIN_CACHE_DIR: ${{ runner.temp }}/plugin-cache
 
     steps:
       - name: Checkout repository
@@ -18,6 +20,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.0
+
+      - name: Terraform Init (clean)
+      run: terraform init -upgrade -reconfigure
+      working-directory: ./terraform
 
       - name: Terraform Init
         run: terraform init
