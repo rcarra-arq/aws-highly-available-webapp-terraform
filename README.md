@@ -116,3 +116,5 @@ Cloud engineering project developed as part of AWS learning journey focused on I
 Optional Resume Version (Short)
 
 This project implements a highly available AWS architecture using Terraform, including an Application Load Balancer, Auto Scaling Group, and EC2 instances across multiple Availability Zones. It follows cloud best practices such as infrastructure as code, security segmentation, and CI/CD automation using GitHub Actions.
+
+And worth mentioning after HOURS of trying to debug what was going on, that "openpgp: key expired" in Terraform is a known Terraform 1.6.0 bug, not a config mistake!! Finally found out what was going on and fixed it!
