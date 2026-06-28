@@ -18,7 +18,8 @@ resource "aws_autoscaling_group" "app" {
 
   target_group_arns = [aws_lb_target_group.app.arn]
 
-  health_check_type         = "ELB"
+  #  health_check_type         = "ELB"
+  health_check_type         = "EC2"
   health_check_grace_period = 60
 
   tag {

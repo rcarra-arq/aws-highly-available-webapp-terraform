@@ -3,7 +3,7 @@
 # Application Load Balancer - Entry Point
 # =========================
 resource "aws_lb" "app" {
-  name_prefix        = "${var.project_name}-alb"
+  name               = "${var.project_name}-alb"
   internal           = false
   load_balancer_type = "application"
 
