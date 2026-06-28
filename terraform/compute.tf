@@ -67,7 +67,9 @@ resource "aws_launch_template" "app" {
     aws_security_group.ec2.id
   ]
 
-  user_data = filebase64("${path.module}/userdata.sh")
+  user_data = base64encode(templatefile("${path.module}/userdata.sh", {
+    project_name = var.project_name
+  }))
 
   tag_specifications {
     resource_type = "instance"
