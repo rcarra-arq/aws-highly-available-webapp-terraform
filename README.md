@@ -1,18 +1,14 @@
 AWS Highly Available Web Application (Terraform)
-
+---
 Overview (English)
 
-This project provisions a highly available web application on AWS using Terraform Infrastructure as Code (IaC). The architecture is designed with scalability, security, and automation in mind, following real-world cloud engineering practices.
-
-It includes an Application Load Balancer, Auto Scaling Group, EC2 instances running Nginx, and a full CI pipeline using GitHub Actions.
+This project provisions a highly available web application on AWS using Terraform Infrastructure as Code (IaC). The architecture is designed with scalability, security, and automation in mind, following real-world cloud engineering practices. It includes an Application Load Balancer, Auto Scaling Group, EC2 instances running Nginx, and a full CI pipeline using GitHub Actions.
 
 Visão Geral (Português)
 
-Este projeto implementa uma aplicação altamente disponível na AWS utilizando Terraform como Infrastructure as Code (IaC). A arquitetura foi projetada com foco em escalabilidade, segurança e automação, seguindo boas práticas de engenharia de cloud.
-
-Inclui Load Balancer, Auto Scaling Group, instâncias EC2 com Nginx e pipeline de CI com GitHub Actions.
-
-Architecture / Arquitetura
+Este projeto implementa uma aplicação altamente disponível na AWS utilizando Terraform como Infrastructure as Code (IaC). A arquitetura foi projetada com foco em escalabilidade, segurança e automação, seguindo boas práticas de engenharia de cloud. Inclui Load Balancer, Auto Scaling Group, instâncias EC2 com Nginx e pipeline de CI com GitHub Actions.
+---
+Architecture | Arquitetura
 
 Internet
 ↓
@@ -23,7 +19,7 @@ Target Group
 Auto Scaling Group
 ↓
 EC2 Instances (Nginx)
-
+---
 AWS Components
 
 - Virtual Private Cloud (VPC)
@@ -36,7 +32,7 @@ AWS Components
 - EC2 Instances running Nginx
 - Security Groups (layered architecture)
 - IAM Role with SSM access
-
+---
 Security Design
 
 - ALB exposed to the internet on HTTP (port 80)
@@ -44,7 +40,7 @@ Security Design
 - EC2 only accepts traffic from ALB Security Group
 - SSH access used only for temporary debugging
 - IAM role used instead of static credentials
-
+---
 CI/CD Pipeline
 
 The project uses GitHub Actions to validate Terraform code automatically.
@@ -55,7 +51,7 @@ Pipeline includes:
 - Terraform validation
 - Terraform plan on pull requests
 - Plan exported as artifact for review
-
+---
 Project Structure
 
 .
@@ -68,7 +64,7 @@ Project Structure
 ├── outputs.tf
 ├── userdata.sh
 └── .github/workflows/terraform.yml
-
+---
 How to Deploy
 
 Initialize Terraform:
@@ -90,7 +86,7 @@ terraform output
 
 Open in browser:
 http://<alb-dns>
-
+---
 What I Learned
 
 - Designing scalable AWS architectures
@@ -99,7 +95,7 @@ What I Learned
 - Building secure cloud network architectures
 - Automating infrastructure validation with CI/CD pipelines
 - Structuring production-like cloud environments
-
+---
 Future Improvements
 
 - HTTPS with ACM and Route 53
@@ -109,10 +105,10 @@ Future Improvements
 - Private subnets for EC2 layer
 - WAF in front of ALB
 
-
-
+---
 Cloud engineering project developed as part of AWS learning journey focused on Infrastructure as Code and DevOps practices.
 
 This project implements a highly available AWS architecture using Terraform, including an Application Load Balancer, Auto Scaling Group, and EC2 instances across multiple Availability Zones. It follows cloud best practices such as infrastructure as code, security segmentation, and CI/CD automation using GitHub Actions.
 
 And worth mentioning after HOURS of trying to debug what was going on, that "openpgp: key expired" in Terraform is a known Terraform 1.6.0 bug, not a config mistake!! Finally found out what was going on and fixed it!
+---
