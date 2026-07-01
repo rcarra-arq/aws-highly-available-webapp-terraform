@@ -109,11 +109,9 @@ Future Improvements
 - Private subnets for EC2 layer
 - WAF in front of ALB
 
-Author
+
 
 Cloud engineering project developed as part of AWS learning journey focused on Infrastructure as Code and DevOps practices.
-
-Optional Resume Version (Short)
 
 This project implements a highly available AWS architecture using Terraform, including an Application Load Balancer, Auto Scaling Group, and EC2 instances across multiple Availability Zones. It follows cloud best practices such as infrastructure as code, security segmentation, and CI/CD automation using GitHub Actions.
 
