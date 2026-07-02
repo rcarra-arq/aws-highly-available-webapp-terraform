@@ -14,7 +14,7 @@ Este projeto implementa uma aplicação altamente disponível na AWS utilizando 
 
 ---
 
-Architecture | Arquitetura
+##Architecture | Arquitetura
 
 Internet
 ↓
@@ -28,7 +28,7 @@ EC2 Instances (Nginx)
 
 ---
 
-AWS Components
+##AWS Components
 
 - Virtual Private Cloud (VPC)
 - Public Subnets (Multi-AZ using for_each)
@@ -43,7 +43,7 @@ AWS Components
   
 ---
 
-Security Design
+##Security 
 
 - ALB exposed to the internet on HTTP (port 80)
 - EC2 instances are not directly exposed
@@ -53,18 +53,18 @@ Security Design
   
 ---
 
-CI/CD Pipeline
+##CI/CD Pipeline
 
 The project uses GitHub Actions to validate Terraform code automatically.
 
-Pipeline includes:
+##Pipeline includes:
 - Terraform format check
 - Terraform initialization
 - Terraform validation
 - Terraform plan on pull requests
 - Plan exported as artifact for review
 ---
-Project Structure
+##Project Structure
 
 .
 ├── network.tf
@@ -77,7 +77,7 @@ Project Structure
 ├── userdata.sh
 └── .github/workflows/terraform.yml
 ---
-How to Deploy
+##How to Deploy
 
 Initialize Terraform:
 terraform init
@@ -99,7 +99,7 @@ terraform output
 Open in browser:
 http://<alb-dns>
 ---
-What I Learned
+##What I Learned
 
 - Designing scalable AWS architectures
 - Implementing Infrastructure as Code with Terraform
@@ -110,7 +110,7 @@ What I Learned
   
 ---
 
-Future Improvements
+##Future Improvements
 
 - HTTPS with ACM and Route 53
 - Blue/Green deployments
