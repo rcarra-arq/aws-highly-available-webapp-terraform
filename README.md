@@ -2,7 +2,7 @@
 ![AWS](https://img.shields.io/badge/AWS-Cloud-orange)
 
 ##AWS Highly Available Web Application (Terraform)
-
+---
 Overview (English)
 
 This project provisions a highly available web application on AWS using Terraform Infrastructure as Code (IaC). The architecture is designed with scalability, security, and automation in mind, following real-world cloud engineering practices. It includes an Application Load Balancer, Auto Scaling Group, EC2 instances running Nginx, and a full CI pipeline using GitHub Actions.
