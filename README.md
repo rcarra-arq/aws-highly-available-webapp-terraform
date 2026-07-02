@@ -25,7 +25,9 @@ Target Group
 Auto Scaling Group
 ↓
 EC2 Instances (Nginx)
+
 ---
+
 AWS Components
 
 - Virtual Private Cloud (VPC)
@@ -38,7 +40,9 @@ AWS Components
 - EC2 Instances running Nginx
 - Security Groups (layered architecture)
 - IAM Role with SSM access
+  
 ---
+
 Security Design
 
 - ALB exposed to the internet on HTTP (port 80)
@@ -46,7 +50,9 @@ Security Design
 - EC2 only accepts traffic from ALB Security Group
 - SSH access used only for temporary debugging
 - IAM role used instead of static credentials
+  
 ---
+
 CI/CD Pipeline
 
 The project uses GitHub Actions to validate Terraform code automatically.
@@ -101,7 +107,9 @@ What I Learned
 - Building secure cloud network architectures
 - Automating infrastructure validation with CI/CD pipelines
 - Structuring production-like cloud environments
+  
 ---
+
 Future Improvements
 
 - HTTPS with ACM and Route 53
@@ -112,6 +120,7 @@ Future Improvements
 - WAF in front of ALB
 
 ---
+
 Cloud engineering project developed as part of AWS learning journey focused on Infrastructure as Code and DevOps practices.
 
 This project implements a highly available AWS architecture using Terraform, including an Application Load Balancer, Auto Scaling Group, and EC2 instances across multiple Availability Zones. It follows cloud best practices such as infrastructure as code, security segmentation, and CI/CD automation using GitHub Actions.
