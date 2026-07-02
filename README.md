@@ -76,6 +76,7 @@ The project uses GitHub Actions to validate Terraform code automatically.
 ├── outputs.tf
 ├── userdata.sh
 └── .github/workflows/terraform.yml
+
 ---
 ##How to Deploy
 
