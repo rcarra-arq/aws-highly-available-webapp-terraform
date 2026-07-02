@@ -3,6 +3,7 @@
 
 ##AWS Highly Available Web Application (Terraform)
 ---
+
 Overview (English)
 
 This project provisions a highly available web application on AWS using Terraform Infrastructure as Code (IaC). The architecture is designed with scalability, security, and automation in mind, following real-world cloud engineering practices. It includes an Application Load Balancer, Auto Scaling Group, EC2 instances running Nginx, and a full CI pipeline using GitHub Actions.
@@ -10,6 +11,7 @@ This project provisions a highly available web application on AWS using Terrafor
 Visão Geral (Português)
 
 Este projeto implementa uma aplicação altamente disponível na AWS utilizando Terraform como Infrastructure as Code (IaC). A arquitetura foi projetada com foco em escalabilidade, segurança e automação, seguindo boas práticas de engenharia de cloud. Inclui Load Balancer, Auto Scaling Group, instâncias EC2 com Nginx e pipeline de CI com GitHub Actions.
+
 ---
 Architecture | Arquitetura
 
