@@ -1,7 +1,7 @@
 
 ![AWS](https://img.shields.io/badge/AWS-Cloud-orange)
 
-## AWS Highly Available Web Application (Terraform)
+## *AWS Highly Available Web Application (Terraform)*
 ---
 
 Overview (English)
@@ -30,16 +30,16 @@ EC2 Instances (Nginx)
 
 ## AWS Components
 
-- Virtual Private Cloud (VPC)
-- Public Subnets (Multi-AZ using for_each)
-- Internet Gateway
-- Route Tables
-- Application Load Balancer (ALB)
-- Target Group with Health Checks
-- Auto Scaling Group (ASG)
-- EC2 Instances running Nginx
-- Security Groups (layered architecture)
-- IAM Role with SSM access
+- [x] Virtual Private Cloud (VPC)
+- [x] Public Subnets (Multi-AZ using for_each)
+- [x] Internet Gateway
+- [x] Route Tables
+- [x] Application Load Balancer (ALB)
+- [x] Target Group with Health Checks
+- [x] Auto Scaling Group (ASG)
+- [x] EC2 Instances running Nginx
+- [x] Security Groups (layered architecture)
+- [x] IAM Role with SSM access
   
 ---
 
