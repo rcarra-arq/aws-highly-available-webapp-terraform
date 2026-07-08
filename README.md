@@ -1,5 +1,7 @@
-
 ![AWS](https://img.shields.io/badge/AWS-Cloud-orange)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-purple)
+![Docker](https://img.shields.io/badge/Docker-Container-blue)
+![Linux](https://img.shields.io/badge/Linux-Ubuntu-black)
 
 ## *AWS Highly Available Web Application (Terraform)*
 ---
