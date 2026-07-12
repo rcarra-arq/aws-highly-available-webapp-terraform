@@ -106,7 +106,7 @@ http://<alb-dns>
 
 ## Challenges & Troubleshooting
 
-While setting up the CI/CD pipeline, `terraform init` began failing in GitHub Actions with an `openpgp: key expired` error during provider installation. After ruling out plugin cache misconfiguration and pinning the AWS provider to an older version (which didn't fix it either), research revealed this was a known bug in Terraform 1.6.0's signature verification, fixed in later releases. Updating the pipeline to Terraform 1.9.8 resolved it completely — a good reminder that CI errors aren't always about your own code.
+While setting up the CI pipeline for this project, `terraform init` began failing in GitHub Actions with an `openpgp: key expired` error during AWS provider installation. After ruling out plugin cache misconfiguration and pinning the provider to an older version (which didn't resolve it either), research revealed this was a known bug in Terraform 1.6.0's signature verification, fixed in later releases. Updating the pipeline to Terraform 1.9.8 resolved it completely — a good reminder that CI failures aren't always caused by your own configuration.
 
 ---
 
