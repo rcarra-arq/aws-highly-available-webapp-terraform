@@ -7,9 +7,11 @@
 data "aws_ami" "amazon_linux" {
   most_recent = true
 
+  # "al2023-ami-*" alone would also match "al2023-ami-minimal-*";
+  # anchoring the version and kernel keeps this on the standard image.
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
+    values = ["al2023-ami-2023*-kernel-*-x86_64"]
   }
 
   owners = ["amazon"]

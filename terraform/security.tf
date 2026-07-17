@@ -47,14 +47,9 @@ resource "aws_security_group" "ec2" {
     security_groups = [aws_security_group.alb.id]
   }
 
-  # SSH access (temporary for debugging only)
-  ingress {
-    description = "SSH access (temporary)"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # No SSH ingress: the launch template has no key pair, so port 22
+  # was unusable anyway. Shell access, when needed, should come via
+  # SSM Session Manager (IAM role - see compute.tf).
 
   egress {
     description = "Allow all outbound traffic"
