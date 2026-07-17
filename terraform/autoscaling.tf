@@ -18,9 +18,11 @@ resource "aws_autoscaling_group" "app" {
 
   target_group_arns = [aws_lb_target_group.app.arn]
 
-  #  health_check_type         = "ELB"
-  health_check_type         = "EC2"
-  health_check_grace_period = 60
+  # "ELB" so instances failing the ALB health check (e.g. nginx down)
+  # are replaced, not just pulled out of rotation. Grace period covers
+  # the boot time of userdata.sh (dnf update + installs).
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
 
   tag {
     key                 = "Name"

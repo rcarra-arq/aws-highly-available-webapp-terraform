@@ -22,7 +22,9 @@ resource "aws_lb_target_group" "app" {
   vpc_id   = aws_vpc.main.id
 
   health_check {
-    path                = "/"
+    # Dedicated endpoint created by userdata.sh, independent of the
+    # landing page content.
+    path                = "/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
