@@ -122,6 +122,53 @@ While setting up the CI pipeline for this project, `terraform init` began failin
   
 ---
 
+## Cost Optimization
+
+This architecture is designed to be **ephemeral and cheap to run**: spin it up,
+test it, destroy it. Terraform makes the full lifecycle a two-command affair,
+so a complete lab session costs cents.
+
+### Estimated cost (us-east-1, on-demand)
+
+| Resource | Hourly | Monthly (if left running) |
+|---|---|---|
+| Application Load Balancer | ~$0.023 | ~$16.40 |
+| 2x EC2 t3.micro | ~$0.021 | ~$15.20 |
+| 2x EBS gp3 8 GB | ~$0.002 | ~$1.30 |
+| CloudWatch (3 log groups, 2 alarms, 1 dashboard) | ~$0.00 | within free tier at this scale |
+| **Total** | **~$0.05/hour** | **~$33/month** |
+
+A typical 4-hour lab session: **~$0.20**. The real cost risk is not usage —
+it is *forgetting the stack running*. The controls below exist for that.
+
+### Cost controls in this project
+
+- **Standardized tagging** — every resource carries `Project`, `Environment`
+  and `ManagedBy` tags via the provider's `default_tags`, explicitly merged
+  into the launch template for ASG-launched instances (which do not inherit
+  provider tags). This is what lets Cost Explorer answer *"how much does this
+  project cost?"* instead of *"how much does my account cost?"*.
+- **AWS Budget with email alerts** (`budget.tf`) — account-wide monthly budget
+  (default $10) alerting at 80% of actual spend and at 100% of *forecasted*
+  spend. Plain cost budgets are free. Set your email in a gitignored
+  `terraform.tfvars`:
+  ```hcl
+  alert_email = "you@example.com"
+  ```
+- **Cost-conscious defaults** — CloudWatch log retention capped at 7 days
+  (unbounded retention is billed forever), `t3.micro` over the older and
+  slightly pricier `t2.micro`, ASG capped at `max_size = 2`.
+
+### Usage pattern
+
+```bash
+terraform apply   # build everything (~3 min)
+# ...test, break things, learn...
+terraform destroy # tear everything down - $0 while destroyed
+```
+
+---
+
 ## Future Improvements
 
 - HTTPS with ACM and Route 53
