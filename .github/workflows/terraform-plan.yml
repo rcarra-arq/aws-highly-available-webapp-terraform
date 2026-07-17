@@ -5,7 +5,7 @@ on:
   pull_request:
 jobs:
   terraform:
-    name: Terraform Validate & Plan
+    name: Terraform Validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,14 +30,11 @@ jobs:
         run: terraform validate
         working-directory: ./terraform
 
-      - name: Terraform Plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -out=tfplan
-        working-directory: ./terraform
-
-      - name: Upload Terraform Plan
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-plan-${{ github.run_id }}
-          path: ./terraform/tfplan
+      # NOTE: "terraform plan" is intentionally NOT run in CI for now.
+      # It needs AWS credentials to query data sources (AMI, AZs), and
+      # this project runs in an AWS Academy sandbox where IAM is not
+      # available - so a GitHub OIDC role cannot be created, and the
+      # sandbox's short-lived keys are unsuitable for GitHub Secrets.
+      # When the project moves to a regular AWS account, restore the
+      # plan step using aws-actions/configure-aws-credentials with an
+      # OIDC-assumed role (no static secrets).
