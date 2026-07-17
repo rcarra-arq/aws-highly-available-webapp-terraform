@@ -57,9 +57,13 @@ data "aws_ami" "amazon_linux" {
 # Launch Template
 # =========================
 resource "aws_launch_template" "app" {
-  name_prefix   = "${var.project_name}-lt-"
-  image_id      = data.aws_ami.amazon_linux.id
-  instance_type = "t2.micro"
+  name_prefix = "${var.project_name}-lt-"
+  image_id    = data.aws_ami.amazon_linux.id
+
+  # t3.micro over t2.micro: newer generation, slightly cheaper
+  # (~$0.0104/h vs ~$0.0116/h in us-east-1) and better baseline
+  # performance.
+  instance_type = "t3.micro"
 
   # iam_instance_profile {
   #   name = aws_iam_instance_profile.ec2_profile.name
@@ -73,12 +77,16 @@ resource "aws_launch_template" "app" {
     project_name = var.project_name
   }))
 
+  # Instances launched from this template do NOT inherit the provider
+  # default_tags (they are created by the ASG, not by Terraform), so
+  # the common tags are merged in explicitly - otherwise they would be
+  # invisible to cost allocation.
   tag_specifications {
     resource_type = "instance"
 
-    tags = {
+    tags = merge(local.common_tags, {
       Name = "${var.project_name}-ec2"
-    }
+    })
   }
 }
 
