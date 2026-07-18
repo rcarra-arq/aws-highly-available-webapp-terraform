@@ -68,16 +68,25 @@ The project uses GitHub Actions to validate Terraform code automatically.
 ---
 ## Project Structure
 
+```
 .
-├── network.tf
-├── security.tf
-├── compute.tf
-├── alb.tf
-├── autoscaling.tf
-├── variables.tf
-├── outputs.tf
-├── userdata.sh
-└── .github/workflows/terraform.yml
+├── terraform/
+│   ├── network.tf        # VPC, subnets (multi-AZ), IGW, routing
+│   ├── security.tf       # layered security groups (ALB -> EC2)
+│   ├── alb.tf            # load balancer, target group, health check
+│   ├── autoscaling.tf    # ASG with ELB health checks
+│   ├── scaling.tf        # scaling policies + CloudWatch alarms
+│   ├── compute.tf        # AMI lookup, launch template
+│   ├── cloudwatch.tf     # log groups (7-day retention)
+│   ├── dashboard.tf      # CloudWatch dashboard (CPU, requests)
+│   ├── budget.tf         # AWS Budget with cost alerts
+│   ├── provider.tf       # provider + default_tags
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── versions.tf
+│   └── userdata.sh       # nginx + /health + CloudWatch agent
+└── .github/workflows/terraform-plan.yml
+```
 
 ---
 ## How to Deploy
@@ -173,10 +182,14 @@ terraform destroy # tear everything down - $0 while destroyed
 
 - HTTPS with ACM and Route 53
 - Blue/Green deployments
-- CloudWatch monitoring and alarms
 - Remote backend with S3 and DynamoDB
 - Private subnets for EC2 layer
 - WAF in front of ALB
+- OIDC-authenticated `terraform plan` in CI (blocked in the Academy sandbox)
+
+Already delivered from this list: CloudWatch monitoring (log groups, dashboard
+and CPU alarms driving the Auto Scaling policies) and cost controls (tagging,
+budget alerts, cost estimates).
 
 ---
 
