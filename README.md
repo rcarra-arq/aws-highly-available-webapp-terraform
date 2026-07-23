@@ -1,10 +1,28 @@
 ![AWS](https://img.shields.io/badge/AWS-Cloud-orange)
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-purple)
+![FinOps](https://img.shields.io/badge/FinOps-Cost_Governance-2ea44f)
+![Reliability](https://img.shields.io/badge/Reliability-Multi--AZ_HA-1f6feb)
 ![Docker](https://img.shields.io/badge/Docker-Container-blue)
 ![Linux](https://img.shields.io/badge/Linux-Ubuntu-black)
 
 ## *AWS Highly Available Web Application (Terraform)*
 ---
+
+> **Portfolio focus / Foco deste projeto:** this repo doubles as a hands-on
+> case study in **FinOps (cost governance)** and **Reliability Engineering**.
+>
+> - 💰 **Cost governance (FinOps)** — standardized `default_tags` (so Cost
+>   Explorer can answer *"how much does *this project* cost?"*), an AWS Budget
+>   with real-spend and forecast alerts, and a per-resource cost breakdown.
+>   → [Cost Governance (FinOps)](#cost-governance-finops)
+> - 🛡️ **Reliability** — multi-AZ Auto Scaling, ELB health checks, CloudWatch
+>   alarms driving scaling, and a documented real-world troubleshooting case.
+>   → [Reliability &amp; Troubleshooting](#reliability--troubleshooting)
+>
+> *Este projeto também serve de estudo prático de **FinOps** (tagging
+> padronizado + AWS Budgets com alertas reais) e **Engenharia de
+> Confiabilidade** (multi-AZ, health checks, alarmes) — com um caso de
+> troubleshooting real documentado.*
 
 Overview (English)
 
@@ -113,9 +131,17 @@ http://<alb-dns>
 
 ---
 
-## Challenges & Troubleshooting
+## Reliability & Troubleshooting
 
-And worth mentioning after HOURS of trying to debug what was going on, finally found out what was going on and fixed it:
+**Reliability by design.** Availability here is not an accident of a single
+healthy server — it is engineered: instances run across **multiple
+Availability Zones**, the **ELB health check** pulls an unhealthy instance out
+of rotation, the **Auto Scaling Group** replaces it, and **CloudWatch alarms**
+on CPU drive the scaling policies. If one AZ or instance fails, the ALB keeps
+serving from the others.
+
+**A real troubleshooting case (documented).** After HOURS of debugging, here is
+what broke and how it was fixed:
 While setting up the CI pipeline for this project, `terraform init` began failing in GitHub Actions with an `openpgp: key expired` error during AWS provider installation. After ruling out plugin cache misconfiguration and pinning the provider to an older version (which didn't resolve it either), research revealed this was a known bug in Terraform 1.6.0's signature verification, fixed in later releases. Updating the pipeline to Terraform 1.9.8 resolved it completely — a good reminder that CI failures aren't always caused by your own configuration.
 
 ---
@@ -131,7 +157,7 @@ While setting up the CI pipeline for this project, `terraform init` began failin
   
 ---
 
-## Cost Optimization
+## Cost Governance (FinOps)
 
 This architecture is designed to be **ephemeral and cheap to run**: spin it up,
 test it, destroy it. Terraform makes the full lifecycle a two-command affair,
