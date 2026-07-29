@@ -42,7 +42,7 @@ data "aws_ami" "amazon_linux" {
 #  role       = aws_iam_role.ec2_role.name
 #  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 #}
-# AIM is not allowed in AWS ACADEMY LAB SANDBOX, SO I REMOVED THIS TEMPORARILY
+# IAM is not allowed in AWS ACADEMY LAB SANDBOX, SO I REMOVED THIS TEMPORARILY
 
 # =========================
 # Instance Profile
