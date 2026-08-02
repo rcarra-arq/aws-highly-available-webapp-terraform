@@ -11,11 +11,11 @@
 > **Portfolio focus / Foco deste projeto:** this repo doubles as a hands-on
 > case study in **FinOps (cost governance)** and **Reliability Engineering**.
 >
-> - 💰 **Cost governance (FinOps)** — standardized `default_tags` (so Cost
+> - **Cost governance (FinOps)** — standardized `default_tags` (so Cost
 >   Explorer can answer *"how much does *this project* cost?"*), an AWS Budget
 >   with real-spend and forecast alerts, and a per-resource cost breakdown.
 >   → [Cost Governance (FinOps)](#cost-governance-finops)
-> - 🛡️ **Reliability** — multi-AZ Auto Scaling, ELB health checks, CloudWatch
+> - **Reliability** — multi-AZ Auto Scaling, ELB health checks, CloudWatch
 >   alarms driving scaling, and a documented real-world troubleshooting case.
 >   → [Reliability &amp; Troubleshooting](#reliability--troubleshooting)
 >
