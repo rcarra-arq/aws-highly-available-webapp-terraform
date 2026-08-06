@@ -27,6 +27,15 @@ engineering practices. It includes an Application Load Balancer, an Auto
 Scaling Group, EC2 instances running Nginx, and a full CI pipeline using
 GitHub Actions.
 
+## My reasons
+
+I wanted to explore and understand this modern reality where everything has to
+keep running — especially living in a metropolis like mine, where everything is
+frantic and nothing can stop. That came together with something I'd been
+thinking about in DevOps: the idea of being on-call — if something fails, you
+have to fix it, no matter the hour. I needed to test how to automate that... and
+that's where the idea for a highly available application came from.
+
 ## Architecture
 
 ```
@@ -219,6 +228,15 @@ com foco em escalabilidade, segurança e automação, seguindo práticas reais d
 engenharia de nuvem. Inclui um Application Load Balancer, um Auto Scaling
 Group, instâncias EC2 rodando Nginx e um pipeline de CI completo com GitHub
 Actions.
+
+### O porquê
+
+Eu queria explorar e entender como funciona essa realidade atual em que tudo
+precisa continuar funcionando. Principalmente morando numa metrópole como eu
+moro, onde tudo é frenético e nada pode ser interrompido. Isso se somou a algo
+que venho pensando sobre DevOps: a ideia do plantão — se tem uma falha,
+precisamos arrumar, não importa o horário. Eu precisava testar como automatizar
+isso... e por isso veio a ideia da aplicação de alta disponibilidade.
 
 ### Arquitetura
 
