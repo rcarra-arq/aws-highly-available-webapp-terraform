@@ -123,16 +123,14 @@ terraform output
 
 ## Reliability & Troubleshooting
 
-**Reliability by design.** Availability here is not an accident of a single
-healthy server — it is engineered: instances run across **multiple
-Availability Zones**, the **ELB health check** pulls an unhealthy instance out
-of rotation, the **Auto Scaling Group** replaces it, and **CloudWatch alarms**
-on CPU drive the scaling policies. If one AZ or instance fails, the ALB keeps
-serving from the others.
+**Reliability by design.** The whole point was that a single server going down
+shouldn't take the app with it. So the instances run across **multiple
+Availability Zones**; the **ELB health check** notices an unhealthy instance and
+takes it out of rotation; the **Auto Scaling Group** replaces it automatically;
+and **CloudWatch alarms** on CPU trigger the scaling. If one instance or even a
+whole zone fails, the load balancer just keeps serving from the others.
 
-**A real troubleshooting case (documented).** After HOURS of debugging, here is
-what broke and how it was fixed:
-While setting up the CI pipeline for this project, `terraform init` began failing in GitHub Actions with an `openpgp: key expired` error during AWS provider installation. After ruling out plugin cache misconfiguration and pinning the provider to an older version (which didn't resolve it either), research revealed this was a known bug in Terraform 1.6.0's signature verification, fixed in later releases. Updating the pipeline to Terraform 1.9.8 resolved it completely — a good reminder that CI failures aren't always caused by your own configuration.
+**A real troubleshooting case.** Setting up the CI for this project, `terraform init` kept failing in GitHub Actions with an `openpgp: key expired` error while installing the AWS provider. It took me hours. I tried clearing the plugin cache and pinning the provider to an older version — and none of it worked. I kept investigating and found it wasn't my configuration at all: it was a known bug in Terraform 1.6.0's signature check, fixed in later versions. Updating the pipeline to Terraform 1.9.8 solved it. What I took from this: a CI failure isn't always your fault — sometimes the tool itself is the problem.
 
 ## What I Learned
 
@@ -325,16 +323,15 @@ terraform output
 
 ### Confiabilidade & Troubleshooting
 
-**Confiabilidade por design.** A disponibilidade aqui não é sorte de um único
-servidor saudável — ela é projetada: as instâncias rodam em **várias
-Availability Zones**, o **health check do ELB** tira de rotação uma instância
-com problema, o **Auto Scaling Group** a substitui, e **alarmes do CloudWatch**
-na CPU guiam as políticas de scaling. Se uma AZ ou instância cai, o ALB
-continua servindo pelas outras.
+**Confiabilidade por design.** A ideia toda era que um servidor caindo não
+derrubasse a aplicação junto. Então as instâncias rodam em **várias
+Availability Zones**; o **health check do ELB** percebe uma instância com
+problema e tira ela de rotação; o **Auto Scaling Group** substitui
+automaticamente; e **alarmes do CloudWatch** na CPU disparam o scaling. Se uma
+instância ou até uma zona inteira cai, o load balancer simplesmente continua
+servindo pelas outras.
 
-**Um caso real de troubleshooting (documentado).** Depois de HORAS de debug,
-aqui está o que quebrou e como foi resolvido:
-Ao montar o pipeline de CI deste projeto, o `terraform init` começou a falhar no GitHub Actions com o erro `openpgp: key expired` durante a instalação do provider da AWS. Depois de descartar má configuração do cache de plugins e de fixar o provider numa versão mais antiga (que também não resolveu), a pesquisa revelou que era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu de vez — um bom lembrete de que falha no CI nem sempre é culpa da sua própria configuração.
+**Um caso real de troubleshooting.** Montando o CI deste projeto, o `terraform init` vivia falhando no GitHub Actions com o erro `openpgp: key expired` na hora de instalar o provider da AWS. Levei horas. Tentei limpar o cache de plugins, fixar o provider numa versão mais antiga — e nada resolveu. Continuei investigando e descobri que não era a minha configuração: era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu. O que ficou: uma falha no CI nem sempre é culpa sua — às vezes o problema é a própria ferramenta.
 
 ### O que eu aprendi
 
