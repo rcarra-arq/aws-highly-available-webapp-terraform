@@ -7,7 +7,213 @@
 
 # AWS Highly Available Web Application (Terraform)
 
-**🇺🇸 English** · [🇧🇷 Português](#português)
+Este projeto provisiona uma aplicação web de alta disponibilidade na AWS usando
+Terraform como Infrastructure as Code (IaC). A arquitetura foi pensada com foco
+em escalabilidade, segurança e automação. Inclui um Application Load Balancer,
+um Auto Scaling Group, instâncias EC2 rodando Nginx e um pipeline de CI completo
+com GitHub Actions.
+
+This project provisions a highly available web application on AWS using Terraform
+(IaC). It includes an Application Load Balancer, an Auto Scaling Group, EC2
+instances running Nginx, and a full CI pipeline using GitHub Actions.
+
+🇺🇸 [Full version in English ↓](#english)
+
+## Português
+
+> **Foco deste projeto:** este repositório serve de estudo prático de
+> **FinOps (governança de custos)** e **Engenharia de Confiabilidade**.
+>
+> - **Governança de custos (FinOps)** — `default_tags` padronizadas (para o
+>   Cost Explorer responder *"quanto custa este projeto?"*), um AWS Budget com
+>   alertas de gasto real e de previsão, e o custo detalhado por recurso.
+>   → [Governança de Custos (FinOps)](#governança-de-custos-finops)
+> - **Confiabilidade** — Auto Scaling multi-AZ, health checks do ELB,
+>   alarmes do CloudWatch guiando o scaling, e um caso real de troubleshooting
+>   documentado.
+>   → [Confiabilidade & Troubleshooting](#confiabilidade--troubleshooting)
+
+## O porquê
+
+Eu queria explorar e entender como funciona essa realidade atual em que tudo
+precisa continuar funcionando. Principalmente morando numa metrópole como eu
+moro, onde tudo é frenético e nada pode ser interrompido. Isso se somou a algo
+que venho pensando sobre DevOps: a ideia do plantão — se tem uma falha,
+precisamos arrumar, não importa o horário. Eu precisava testar como automatizar
+isso... e por isso veio a ideia da aplicação de alta disponibilidade.
+
+## Arquitetura
+
+```
+Internet
+   ↓
+Application Load Balancer
+   ↓
+Target Group
+   ↓
+Auto Scaling Group
+   ↓
+Instâncias EC2 (Nginx)
+```
+
+## Componentes AWS
+
+- [x] Virtual Private Cloud (VPC)
+- [x] Subnets públicas (multi-AZ com for_each)
+- [x] Internet Gateway
+- [x] Route Tables
+- [x] Application Load Balancer (ALB)
+- [x] Target Group com health checks
+- [x] Auto Scaling Group (ASG)
+- [x] Instâncias EC2 rodando Nginx
+- [x] Security Groups (arquitetura em camadas)
+- [x] IAM Role com acesso SSM
+
+## Segurança
+
+- ALB exposto à internet via HTTP (porta 80)
+- Instâncias EC2 não ficam expostas diretamente
+- EC2 só aceita tráfego vindo do Security Group do ALB
+- Acesso SSH usado apenas para debug temporário
+- IAM role no lugar de credenciais estáticas
+
+## Pipeline CI/CD
+
+O projeto usa GitHub Actions para validar o código Terraform automaticamente.
+
+**O pipeline inclui:**
+
+- Checagem de formatação do Terraform
+- Inicialização do Terraform
+- Validação do Terraform
+- `terraform plan` nos pull requests
+- Plan exportado como artifact para revisão
+
+## Estrutura do projeto
+
+```
+.
+├── terraform/
+│   ├── network.tf        # VPC, subnets (multi-AZ), IGW, roteamento
+│   ├── security.tf       # security groups em camadas (ALB -> EC2)
+│   ├── alb.tf            # load balancer, target group, health check
+│   ├── autoscaling.tf    # ASG com health checks do ELB
+│   ├── scaling.tf        # políticas de scaling + alarmes CloudWatch
+│   ├── compute.tf        # busca de AMI, launch template
+│   ├── cloudwatch.tf     # log groups (retenção de 7 dias)
+│   ├── dashboard.tf      # dashboard CloudWatch (CPU, requisições)
+│   ├── budget.tf         # AWS Budget com alertas de custo
+│   ├── provider.tf       # provider + default_tags
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── versions.tf
+│   └── userdata.sh       # nginx + /health + agente CloudWatch
+└── .github/workflows/terraform-plan.yml
+```
+
+## Como fazer o deploy
+
+```bash
+terraform init       # inicializa
+terraform validate   # valida a configuração
+terraform plan       # cria o plano de execução
+terraform apply      # aplica a infraestrutura
+```
+
+Pegue o DNS do load balancer e abra no navegador:
+
+```bash
+terraform output
+# abra http://<alb-dns>
+```
+
+## Confiabilidade & Troubleshooting
+
+**Confiabilidade por design.** A ideia toda era que um servidor caindo não
+derrubasse a aplicação junto. Então as instâncias rodam em **várias
+Availability Zones**; o **health check do ELB** percebe uma instância com
+problema e tira ela de rotação; o **Auto Scaling Group** substitui
+automaticamente; e **alarmes do CloudWatch** na CPU disparam o scaling. Se uma
+instância ou até uma zona inteira cai, o load balancer simplesmente continua
+servindo pelas outras.
+
+**Um caso real de troubleshooting.** Montando o CI deste projeto, o `terraform init` vivia falhando no GitHub Actions com o erro `openpgp: key expired` na hora de instalar o provider da AWS. Levei horas. Tentei limpar o cache de plugins, fixar o provider numa versão mais antiga — e nada resolveu. Continuei investigando e descobri que não era a minha configuração: era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu. O que ficou: uma falha no CI nem sempre é culpa sua — às vezes o problema é a própria ferramenta.
+
+## O que eu aprendi
+
+- Projetar arquiteturas escaláveis na AWS
+- Implementar Infrastructure as Code com Terraform
+- Trabalhar com Load Balancers e Auto Scaling
+- Construir arquiteturas de rede seguras na nuvem
+- Automatizar a validação da infraestrutura com pipelines de CI/CD
+- Estruturar ambientes de nuvem parecidos com produção
+
+## Governança de Custos (FinOps)
+
+Esta arquitetura foi pensada para ser **efêmera e barata de rodar**: sobe,
+testa, destrói. O Terraform transforma o ciclo de vida completo numa questão
+de dois comandos, então uma sessão de laboratório inteira custa centavos.
+
+### Custo estimado (us-east-1, on-demand)
+
+| Recurso | Por hora | Por mês (se ficar ligado) |
+|---|---|---|
+| Application Load Balancer | ~US$0,023 | ~US$16,40 |
+| 2x EC2 t3.micro | ~US$0,021 | ~US$15,20 |
+| 2x EBS gp3 8 GB | ~US$0,002 | ~US$1,30 |
+| CloudWatch (3 log groups, 2 alarmes, 1 dashboard) | ~US$0,00 | dentro do free tier nessa escala |
+| **Total** | **~US$0,05/hora** | **~US$33/mês** |
+
+Uma sessão típica de 4 horas: **~US$0,20**. O verdadeiro risco de custo não é
+o uso — é *esquecer a stack ligada*. Os controles abaixo existem para isso.
+
+### Controles de custo neste projeto
+
+- **Tagging padronizado** — todo recurso carrega as tags `Project`,
+  `Environment` e `ManagedBy` via `default_tags` do provider, explicitamente
+  mescladas no launch template para as instâncias criadas pelo ASG (que não
+  herdam as tags do provider). É isso que permite o Cost Explorer responder
+  *"quanto custa este projeto?"* em vez de *"quanto custa minha conta?"*.
+- **AWS Budget com alertas por e-mail** (`budget.tf`) — orçamento mensal da
+  conta inteira (padrão US$10) alertando em 80% do gasto real e em 100% do
+  gasto *previsto*. Budgets de custo simples são gratuitos. Defina seu e-mail
+  num `terraform.tfvars` que fica no gitignore:
+  ```hcl
+  alert_email = "voce@exemplo.com"
+  ```
+- **Padrões conscientes de custo** — retenção de logs do CloudWatch limitada a
+  7 dias (retenção infinita é cobrada para sempre), `t3.micro` no lugar do
+  `t2.micro` mais antigo e um pouco mais caro, e ASG limitado a `max_size = 2`.
+
+### Padrão de uso
+
+```bash
+terraform apply   # constrói tudo (~3 min)
+# ...testa, quebra coisas, aprende...
+terraform destroy # derruba tudo - US$0 enquanto destruído
+```
+
+## Melhorias futuras
+
+- HTTPS com ACM e Route 53
+- Deploys Blue/Green
+- Backend remoto com S3 e DynamoDB
+- Subnets privadas para a camada EC2
+- WAF na frente do ALB
+- `terraform plan` autenticado via OIDC no CI (bloqueado no sandbox da Academy)
+
+Já entregues desta lista: monitoramento com CloudWatch (log groups, dashboard
+e alarmes de CPU guiando as políticas de Auto Scaling) e controles de custo
+(tagging, alertas de budget, estimativas de custo).
+
+*Projeto de estudo e portfólio em engenharia de nuvem — Infrastructure as Code
+e práticas de DevOps, construído na prática.*
+
+---
+
+## English
+
+🇧🇷 [Versão em português ↑](#aws-highly-available-web-application-terraform)
 
 > **Portfolio focus:** this repo doubles as a hands-on case study in
 > **FinOps (cost governance)** and **Reliability Engineering**.
@@ -19,13 +225,6 @@
 > - **Reliability** — multi-AZ Auto Scaling, ELB health checks, CloudWatch
 >   alarms driving scaling, and a documented real-world troubleshooting case.
 >   → [Reliability & Troubleshooting](#reliability--troubleshooting)
-
-This project provisions a highly available web application on AWS using
-Terraform Infrastructure as Code (IaC). The architecture is designed with
-scalability, security, and automation in mind, following real-world cloud
-engineering practices. It includes an Application Load Balancer, an Auto
-Scaling Group, EC2 instances running Nginx, and a full CI pipeline using
-GitHub Actions.
 
 ## My reasons
 
@@ -201,204 +400,3 @@ budget alerts, cost estimates).
 
 *Cloud engineering study and portfolio project — Infrastructure as Code and
 DevOps practices, built hands-on.*
-
----
-
-## Português
-
-[🇺🇸 English ⬆](#aws-highly-available-web-application-terraform)
-
-> **Foco deste projeto:** este repositório serve de estudo prático de
-> **FinOps (governança de custos)** e **Engenharia de Confiabilidade**.
->
-> - **Governança de custos (FinOps)** — `default_tags` padronizadas (para o
->   Cost Explorer responder *"quanto custa este projeto?"*), um AWS Budget com
->   alertas de gasto real e de previsão, e o custo detalhado por recurso.
->   → [Governança de Custos (FinOps)](#governança-de-custos-finops)
-> - **Confiabilidade** — Auto Scaling multi-AZ, health checks do ELB,
->   alarmes do CloudWatch guiando o scaling, e um caso real de troubleshooting
->   documentado.
->   → [Confiabilidade & Troubleshooting](#confiabilidade--troubleshooting)
-
-Este projeto provisiona uma aplicação web de alta disponibilidade na AWS
-usando Terraform como Infrastructure as Code (IaC). A arquitetura foi pensada
-com foco em escalabilidade, segurança e automação, seguindo práticas reais de
-engenharia de nuvem. Inclui um Application Load Balancer, um Auto Scaling
-Group, instâncias EC2 rodando Nginx e um pipeline de CI completo com GitHub
-Actions.
-
-### O porquê
-
-Eu queria explorar e entender como funciona essa realidade atual em que tudo
-precisa continuar funcionando. Principalmente morando numa metrópole como eu
-moro, onde tudo é frenético e nada pode ser interrompido. Isso se somou a algo
-que venho pensando sobre DevOps: a ideia do plantão — se tem uma falha,
-precisamos arrumar, não importa o horário. Eu precisava testar como automatizar
-isso... e por isso veio a ideia da aplicação de alta disponibilidade.
-
-### Arquitetura
-
-```
-Internet
-   ↓
-Application Load Balancer
-   ↓
-Target Group
-   ↓
-Auto Scaling Group
-   ↓
-Instâncias EC2 (Nginx)
-```
-
-### Componentes AWS
-
-- [x] Virtual Private Cloud (VPC)
-- [x] Subnets públicas (multi-AZ com for_each)
-- [x] Internet Gateway
-- [x] Route Tables
-- [x] Application Load Balancer (ALB)
-- [x] Target Group com health checks
-- [x] Auto Scaling Group (ASG)
-- [x] Instâncias EC2 rodando Nginx
-- [x] Security Groups (arquitetura em camadas)
-- [x] IAM Role com acesso SSM
-
-### Segurança
-
-- ALB exposto à internet via HTTP (porta 80)
-- Instâncias EC2 não ficam expostas diretamente
-- EC2 só aceita tráfego vindo do Security Group do ALB
-- Acesso SSH usado apenas para debug temporário
-- IAM role no lugar de credenciais estáticas
-
-### Pipeline CI/CD
-
-O projeto usa GitHub Actions para validar o código Terraform automaticamente.
-
-**O pipeline inclui:**
-
-- Checagem de formatação do Terraform
-- Inicialização do Terraform
-- Validação do Terraform
-- `terraform plan` nos pull requests
-- Plan exportado como artifact para revisão
-
-### Estrutura do projeto
-
-```
-.
-├── terraform/
-│   ├── network.tf        # VPC, subnets (multi-AZ), IGW, roteamento
-│   ├── security.tf       # security groups em camadas (ALB -> EC2)
-│   ├── alb.tf            # load balancer, target group, health check
-│   ├── autoscaling.tf    # ASG com health checks do ELB
-│   ├── scaling.tf        # políticas de scaling + alarmes CloudWatch
-│   ├── compute.tf        # busca de AMI, launch template
-│   ├── cloudwatch.tf     # log groups (retenção de 7 dias)
-│   ├── dashboard.tf      # dashboard CloudWatch (CPU, requisições)
-│   ├── budget.tf         # AWS Budget com alertas de custo
-│   ├── provider.tf       # provider + default_tags
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── versions.tf
-│   └── userdata.sh       # nginx + /health + agente CloudWatch
-└── .github/workflows/terraform-plan.yml
-```
-
-### Como fazer o deploy
-
-```bash
-terraform init       # inicializa
-terraform validate   # valida a configuração
-terraform plan       # cria o plano de execução
-terraform apply      # aplica a infraestrutura
-```
-
-Pegue o DNS do load balancer e abra no navegador:
-
-```bash
-terraform output
-# abra http://<alb-dns>
-```
-
-### Confiabilidade & Troubleshooting
-
-**Confiabilidade por design.** A ideia toda era que um servidor caindo não
-derrubasse a aplicação junto. Então as instâncias rodam em **várias
-Availability Zones**; o **health check do ELB** percebe uma instância com
-problema e tira ela de rotação; o **Auto Scaling Group** substitui
-automaticamente; e **alarmes do CloudWatch** na CPU disparam o scaling. Se uma
-instância ou até uma zona inteira cai, o load balancer simplesmente continua
-servindo pelas outras.
-
-**Um caso real de troubleshooting.** Montando o CI deste projeto, o `terraform init` vivia falhando no GitHub Actions com o erro `openpgp: key expired` na hora de instalar o provider da AWS. Levei horas. Tentei limpar o cache de plugins, fixar o provider numa versão mais antiga — e nada resolveu. Continuei investigando e descobri que não era a minha configuração: era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu. O que ficou: uma falha no CI nem sempre é culpa sua — às vezes o problema é a própria ferramenta.
-
-### O que eu aprendi
-
-- Projetar arquiteturas escaláveis na AWS
-- Implementar Infrastructure as Code com Terraform
-- Trabalhar com Load Balancers e Auto Scaling
-- Construir arquiteturas de rede seguras na nuvem
-- Automatizar a validação da infraestrutura com pipelines de CI/CD
-- Estruturar ambientes de nuvem parecidos com produção
-
-### Governança de Custos (FinOps)
-
-Esta arquitetura foi pensada para ser **efêmera e barata de rodar**: sobe,
-testa, destrói. O Terraform transforma o ciclo de vida completo numa questão
-de dois comandos, então uma sessão de laboratório inteira custa centavos.
-
-#### Custo estimado (us-east-1, on-demand)
-
-| Recurso | Por hora | Por mês (se ficar ligado) |
-|---|---|---|
-| Application Load Balancer | ~US$0,023 | ~US$16,40 |
-| 2x EC2 t3.micro | ~US$0,021 | ~US$15,20 |
-| 2x EBS gp3 8 GB | ~US$0,002 | ~US$1,30 |
-| CloudWatch (3 log groups, 2 alarmes, 1 dashboard) | ~US$0,00 | dentro do free tier nessa escala |
-| **Total** | **~US$0,05/hora** | **~US$33/mês** |
-
-Uma sessão típica de 4 horas: **~US$0,20**. O verdadeiro risco de custo não é
-o uso — é *esquecer a stack ligada*. Os controles abaixo existem para isso.
-
-#### Controles de custo neste projeto
-
-- **Tagging padronizado** — todo recurso carrega as tags `Project`,
-  `Environment` e `ManagedBy` via `default_tags` do provider, explicitamente
-  mescladas no launch template para as instâncias criadas pelo ASG (que não
-  herdam as tags do provider). É isso que permite o Cost Explorer responder
-  *"quanto custa este projeto?"* em vez de *"quanto custa minha conta?"*.
-- **AWS Budget com alertas por e-mail** (`budget.tf`) — orçamento mensal da
-  conta inteira (padrão US$10) alertando em 80% do gasto real e em 100% do
-  gasto *previsto*. Budgets de custo simples são gratuitos. Defina seu e-mail
-  num `terraform.tfvars` que fica no gitignore:
-  ```hcl
-  alert_email = "voce@exemplo.com"
-  ```
-- **Padrões conscientes de custo** — retenção de logs do CloudWatch limitada a
-  7 dias (retenção infinita é cobrada para sempre), `t3.micro` no lugar do
-  `t2.micro` mais antigo e um pouco mais caro, e ASG limitado a `max_size = 2`.
-
-#### Padrão de uso
-
-```bash
-terraform apply   # constrói tudo (~3 min)
-# ...testa, quebra coisas, aprende...
-terraform destroy # derruba tudo - US$0 enquanto destruído
-```
-
-### Melhorias futuras
-
-- HTTPS com ACM e Route 53
-- Deploys Blue/Green
-- Backend remoto com S3 e DynamoDB
-- Subnets privadas para a camada EC2
-- WAF na frente do ALB
-- `terraform plan` autenticado via OIDC no CI (bloqueado no sandbox da Academy)
-
-Já entregues desta lista: monitoramento com CloudWatch (log groups, dashboard
-e alarmes de CPU guiando as políticas de Auto Scaling) e controles de custo
-(tagging, alertas de budget, estimativas de custo).
-
-*Projeto de estudo e portfólio em engenharia de nuvem — Infrastructure as Code
-e práticas de DevOps, construído na prática.*
