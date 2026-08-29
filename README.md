@@ -24,11 +24,11 @@ instances running Nginx, and a full CI pipeline using GitHub Actions.
 > **Foco deste projeto:** este repositório serve de estudo prático de
 > **FinOps (governança de custos)** e **Engenharia de Confiabilidade**.
 >
-> - **Governança de custos (FinOps)** — `default_tags` padronizadas (para o
+> - **Governança de custos (FinOps)**: `default_tags` padronizadas (para o
 >   Cost Explorer responder *"quanto custa este projeto?"*), um AWS Budget com
 >   alertas de gasto real e de previsão, e o custo detalhado por recurso.
 >   → [Governança de Custos (FinOps)](#governança-de-custos-finops)
-> - **Confiabilidade** — Auto Scaling multi-AZ, health checks do ELB,
+> - **Confiabilidade**: Auto Scaling multi-AZ, health checks do ELB,
 >   alarmes do CloudWatch guiando o scaling, e um caso real de troubleshooting
 >   documentado.
 >   → [Confiabilidade & Troubleshooting](#confiabilidade--troubleshooting)
@@ -38,7 +38,7 @@ instances running Nginx, and a full CI pipeline using GitHub Actions.
 Eu queria explorar e entender como funciona essa realidade atual em que tudo
 precisa continuar funcionando. Principalmente morando numa metrópole como eu
 moro, onde tudo é frenético e nada pode ser interrompido. Isso se somou a algo
-que venho pensando sobre DevOps: a ideia do plantão — se tem uma falha,
+que venho pensando sobre DevOps: a ideia do plantão. Se tem uma falha,
 precisamos arrumar, não importa o horário. Eu precisava testar como automatizar
 isso... e por isso veio a ideia da aplicação de alta disponibilidade.
 
@@ -137,7 +137,7 @@ automaticamente; e **alarmes do CloudWatch** na CPU disparam o scaling. Se uma
 instância ou até uma zona inteira cai, o load balancer simplesmente continua
 servindo pelas outras.
 
-**Um caso real de troubleshooting.** Montando o CI deste projeto, o `terraform init` vivia falhando no GitHub Actions com o erro `openpgp: key expired` na hora de instalar o provider da AWS. Levei horas. Tentei limpar o cache de plugins, fixar o provider numa versão mais antiga — e nada resolveu. Continuei investigando e descobri que não era a minha configuração: era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu. O que ficou: uma falha no CI nem sempre é culpa sua — às vezes o problema é a própria ferramenta.
+**Um caso real de troubleshooting.** Montando o CI deste projeto, o `terraform init` vivia falhando no GitHub Actions com o erro `openpgp: key expired` na hora de instalar o provider da AWS. Levei horas. Tentei limpar o cache de plugins, fixar o provider numa versão mais antiga, e nada resolveu. Continuei investigando e descobri que não era a minha configuração: era um bug conhecido na verificação de assinatura do Terraform 1.6.0, corrigido em versões posteriores. Atualizar o pipeline para o Terraform 1.9.8 resolveu. O que ficou: uma falha no CI nem sempre é culpa sua, às vezes o problema é a própria ferramenta.
 
 ## O que eu aprendi
 
@@ -165,29 +165,29 @@ de dois comandos, então uma sessão de laboratório inteira custa centavos.
 | **Total** | **~US$0,05/hora** | **~US$33/mês** |
 
 Uma sessão típica de 4 horas: **~US$0,20**. O verdadeiro risco de custo não é
-o uso — é *esquecer a stack ligada*. Os controles abaixo existem para isso.
+o uso; é *esquecer a stack ligada*. Os controles abaixo existem para isso.
 
 ### Controles de custo neste projeto
 
-- **Tagging padronizado** — todo recurso carrega as tags `Project`,
+- **Tagging padronizado**: todo recurso carrega as tags `Project`,
   `Environment` e `ManagedBy` via `default_tags` do provider, explicitamente
   mescladas no launch template para as instâncias criadas pelo ASG (que não
   herdam as tags do provider). É isso que permite o Cost Explorer responder
   *"quanto custa este projeto?"* em vez de *"quanto custa minha conta?"*.
-- **AWS Budget com alertas por e-mail** (`budget.tf`) — orçamento mensal da
+- **AWS Budget com alertas por e-mail** (`budget.tf`): orçamento mensal da
   conta inteira (padrão US$10) alertando em 80% do gasto real e em 100% do
   gasto *previsto*. Budgets de custo simples são gratuitos. Defina seu e-mail
   num `terraform.tfvars` que fica no gitignore:
   ```hcl
   alert_email = "voce@exemplo.com"
   ```
-- **Padrões conscientes de custo** — retenção de logs do CloudWatch limitada a
+- **Padrões conscientes de custo**: retenção de logs do CloudWatch limitada a
   7 dias (retenção infinita é cobrada para sempre), `t3.micro` no lugar do
   `t2.micro` mais antigo e um pouco mais caro, e ASG com teto em
   `max_size = 5`. O teto não é o custo do dia a dia: o scale out só dispara
   com a CPU média acima de 60% por dois períodos, então em uso normal a stack
   fica nas 2 instâncias da tabela acima. O `max_size` existe para limitar o
-  pior caso — no teto, seriam ~US$56/mês em vez de ~US$33.
+  pior caso: no teto, seriam ~US$56/mês em vez de ~US$33.
 
 ### Padrão de uso
 
@@ -210,7 +210,7 @@ Já entregues desta lista: monitoramento com CloudWatch (log groups, dashboard
 e alarmes de CPU guiando as políticas de Auto Scaling) e controles de custo
 (tagging, alertas de budget, estimativas de custo).
 
-*Projeto de estudo e portfólio em engenharia de nuvem — Infrastructure as Code
+*Projeto de estudo e portfólio em engenharia de nuvem, Infrastructure as Code
 e práticas de DevOps, construído na prática.*
 
 ---
@@ -222,20 +222,20 @@ e práticas de DevOps, construído na prática.*
 > **Portfolio focus:** this repo doubles as a hands-on case study in
 > **FinOps (cost governance)** and **Reliability Engineering**.
 >
-> - **Cost governance (FinOps)** — standardized `default_tags` (so Cost
+> - **Cost governance (FinOps)**: standardized `default_tags` (so Cost
 >   Explorer can answer *"how much does this project cost?"*), an AWS Budget
 >   with real-spend and forecast alerts, and a per-resource cost breakdown.
 >   → [Cost Governance (FinOps)](#cost-governance-finops)
-> - **Reliability** — multi-AZ Auto Scaling, ELB health checks, CloudWatch
+> - **Reliability**: multi-AZ Auto Scaling, ELB health checks, CloudWatch
 >   alarms driving scaling, and a documented real-world troubleshooting case.
 >   → [Reliability & Troubleshooting](#reliability--troubleshooting)
 
 ## My reasons
 
 I wanted to explore and understand this modern reality where everything has to
-keep running — especially living in a metropolis like mine, where everything is
+keep running, especially living in a metropolis like mine, where everything is
 frantic and nothing can stop. That came together with something I'd been
-thinking about in DevOps: the idea of being on-call — if something fails, you
+thinking about in DevOps: the idea of being on-call. If something fails, you
 have to fix it, no matter the hour. I needed to test how to automate that... and
 that's where the idea for a highly available application came from.
 
@@ -333,7 +333,7 @@ takes it out of rotation; the **Auto Scaling Group** replaces it automatically;
 and **CloudWatch alarms** on CPU trigger the scaling. If one instance or even a
 whole zone fails, the load balancer just keeps serving from the others.
 
-**A real troubleshooting case.** Setting up the CI for this project, `terraform init` kept failing in GitHub Actions with an `openpgp: key expired` error while installing the AWS provider. It took me hours. I tried clearing the plugin cache and pinning the provider to an older version — and none of it worked. I kept investigating and found it wasn't my configuration at all: it was a known bug in Terraform 1.6.0's signature check, fixed in later versions. Updating the pipeline to Terraform 1.9.8 solved it. What I took from this: a CI failure isn't always your fault — sometimes the tool itself is the problem.
+**A real troubleshooting case.** Setting up the CI for this project, `terraform init` kept failing in GitHub Actions with an `openpgp: key expired` error while installing the AWS provider. It took me hours. I tried clearing the plugin cache and pinning the provider to an older version, and none of it worked. I kept investigating and found it wasn't my configuration at all: it was a known bug in Terraform 1.6.0's signature check, fixed in later versions. Updating the pipeline to Terraform 1.9.8 solved it. What I took from this: a CI failure isn't always your fault, sometimes the tool itself is the problem.
 
 ## What I Learned
 
@@ -360,29 +360,29 @@ so a complete lab session costs cents.
 | CloudWatch (3 log groups, 2 alarms, 1 dashboard) | ~$0.00 | within free tier at this scale |
 | **Total** | **~$0.05/hour** | **~$33/month** |
 
-A typical 4-hour lab session: **~$0.20**. The real cost risk is not usage —
+A typical 4-hour lab session: **~$0.20**. The real cost risk is not usage;
 it is *forgetting the stack running*. The controls below exist for that.
 
 ### Cost controls in this project
 
-- **Standardized tagging** — every resource carries `Project`, `Environment`
+- **Standardized tagging**: every resource carries `Project`, `Environment`
   and `ManagedBy` tags via the provider's `default_tags`, explicitly merged
   into the launch template for ASG-launched instances (which do not inherit
   provider tags). This is what lets Cost Explorer answer *"how much does this
   project cost?"* instead of *"how much does my account cost?"*.
-- **AWS Budget with email alerts** (`budget.tf`) — account-wide monthly budget
+- **AWS Budget with email alerts** (`budget.tf`): account-wide monthly budget
   (default $10) alerting at 80% of actual spend and at 100% of *forecasted*
   spend. Plain cost budgets are free. Set your email in a gitignored
   `terraform.tfvars`:
   ```hcl
   alert_email = "you@example.com"
   ```
-- **Cost-conscious defaults** — CloudWatch log retention capped at 7 days
+- **Cost-conscious defaults**: CloudWatch log retention capped at 7 days
   (unbounded retention is billed forever), `t3.micro` over the older and
   slightly pricier `t2.micro`, ASG capped at `max_size = 5`. The cap is not
   the day-to-day cost: scale out only fires when average CPU stays above 60%
   for two periods, so under normal use the stack sits at the 2 instances in
-  the table above. `max_size` is there to bound the worst case — at the cap it
+  the table above. `max_size` is there to bound the worst case: at the cap it
   would be ~$56/month instead of ~$33.
 
 ### Usage pattern
@@ -406,5 +406,5 @@ Already delivered from this list: CloudWatch monitoring (log groups, dashboard
 and CPU alarms driving the Auto Scaling policies) and cost controls (tagging,
 budget alerts, cost estimates).
 
-*Cloud engineering study and portfolio project — Infrastructure as Code and
+*Cloud engineering study and portfolio project, Infrastructure as Code and
 DevOps practices, built hands-on.*
