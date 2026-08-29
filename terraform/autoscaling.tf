@@ -1,6 +1,6 @@
 
 # =========================
-# Auto Scaling Group - High Availability Layer
+# Auto Scaling Group - Alta Escalabilidade Layer
 # =========================
 resource "aws_autoscaling_group" "app" {
   name = "${var.project_name}-asg"
