@@ -183,7 +183,11 @@ o uso — é *esquecer a stack ligada*. Os controles abaixo existem para isso.
   ```
 - **Padrões conscientes de custo** — retenção de logs do CloudWatch limitada a
   7 dias (retenção infinita é cobrada para sempre), `t3.micro` no lugar do
-  `t2.micro` mais antigo e um pouco mais caro, e ASG limitado a `max_size = 2`.
+  `t2.micro` mais antigo e um pouco mais caro, e ASG com teto em
+  `max_size = 5`. O teto não é o custo do dia a dia: o scale out só dispara
+  com a CPU média acima de 60% por dois períodos, então em uso normal a stack
+  fica nas 2 instâncias da tabela acima. O `max_size` existe para limitar o
+  pior caso — no teto, seriam ~US$56/mês em vez de ~US$33.
 
 ### Padrão de uso
 
@@ -375,7 +379,11 @@ it is *forgetting the stack running*. The controls below exist for that.
   ```
 - **Cost-conscious defaults** — CloudWatch log retention capped at 7 days
   (unbounded retention is billed forever), `t3.micro` over the older and
-  slightly pricier `t2.micro`, ASG capped at `max_size = 2`.
+  slightly pricier `t2.micro`, ASG capped at `max_size = 5`. The cap is not
+  the day-to-day cost: scale out only fires when average CPU stays above 60%
+  for two periods, so under normal use the stack sits at the 2 instances in
+  the table above. `max_size` is there to bound the worst case — at the cap it
+  would be ~$56/month instead of ~$33.
 
 ### Usage pattern
 

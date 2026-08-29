@@ -1,12 +1,12 @@
 
 # =========================
-# Auto Scaling Group - Alta Escalabilidade Layer
+# Auto Scaling Group - Availability & Scalability Layer
 # =========================
 resource "aws_autoscaling_group" "app" {
   name = "${var.project_name}-asg"
 
   min_size         = 1
-  max_size         = 2
+  max_size         = 5
   desired_capacity = 2
 
   vpc_zone_identifier = values(aws_subnet.public)[*].id
@@ -28,5 +28,13 @@ resource "aws_autoscaling_group" "app" {
     key                 = "Name"
     value               = "${var.project_name}-instance"
     propagate_at_launch = true
+  }
+
+  # Once the stack is up, desired_capacity belongs to the scaling policies,
+  # not to Terraform. Without this, an apply run while the ASG sits at 3
+  # would reset it to 2 and undo the scale out CloudWatch had just ordered.
+  # min_size and max_size stay managed here - those are the boundaries.
+  lifecycle {
+    ignore_changes = [desired_capacity]
   }
 }
